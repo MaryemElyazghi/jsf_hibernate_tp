@@ -5,6 +5,7 @@ package com.example.bean;
 import com.example.entity.User;
 import com.example.service.UserService;
 import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 
@@ -12,7 +13,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Named
-@SessionScoped
+@RequestScoped
 public class UserBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
