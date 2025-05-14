@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>Application de Gestion JSF + Hibernate</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .panel {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-control {
+            padding: 8px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-danger {
+            background-color: #f44336;
+        }
+        .btn-warning {
+            background-color: #ff9800;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .table th {
+            background-color: #f2f2f2;
+        }
+        h2 {
+            color: #333;
+        }
+    </style>
+</h:head>
+<h:body>
+    <div class="container">
+        <h1>Gestion des Utilisateurs et Automobiles</h1>
+
+        <!-- User Form -->
+        <div class="panel">
+            <h2>#{userBean.editing ? 'Modifier' : 'Ajouter'} un Utilisateur</h2>
+            <h:form>
+                <div class="form-group">
+                    <h:outputLabel for="name" value="Nom:"/>
+                    <h:inputText id="name" value="#{userBean.selectedUser.name}" styleClass="form-control" required="true" requiredMessage="Le nom est obligatoire"/>
+                </div>
+                <div class="form-group">
+                    <h:outputLabel for="age" value="Age:"/>
+                    <h:inputText id="age" value="#{userBean.selectedUser.age}" styleClass="form-control" required="true" requiredMessage="L'âge est obligatoire"/>
+                </div>
+                <div class="form-group">
+                    <h:commandButton value="#{userBean.editing ? 'Mettre à jour' : 'Ajouter'}" action="#{userBean.saveUser}" styleClass="btn"/>
+                    <h:commandButton value="Annuler" action="#{userBean.cancelEdit}" styleClass="btn btn-warning" rendered="#{userBean.editing}" style="margin-left: 10px;"/>
+                </div>
+            </h:form>
+        </div>
+
+        <!-- User List -->
+        <div class="panel">
+            <h2>Liste des Utilisateurs</h2>
+            <h:form>
+                <h:dataTable value="#{userBean.userList}" var="user" styleClass="table">
+                    <h:column>
+                        <f:facet name="header">ID</f:facet>
+                        #{user.id}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Nom</f:facet>
+                        #{user.name}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Age</f:facet>
+                        #{user.age}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Automobiles</f:facet>
+                        <ui:repeat value="#{user.autos}" var="auto">
+                            #{auto.model} (#{auto.color})<br/>
+                        </ui:repeat>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Actions</f:facet>
+                        <h:commandButton value="Mise à jour" action="#{userBean.editUser(user)}" styleClass="btn btn-warning" style="margin-right: 5px;"/>
+                        <h:commandButton value="Supprimer" action="#{userBean.deleteUser(user.id)}" styleClass="btn btn-danger"
+                                         onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur et toutes ses voitures?')"/>
+                    </h:column>
+                </h:dataTable>
+            </h:form>
+        </div>
+
+        <!-- Auto Form -->
+        <div class="panel">
+            <h2>Ajouter une Automobile</h2>
+            <h:form>
+                <div class="form-group">
+                    <h:outputLabel for="model" value="Modèle:"/>
+                    <h:inputText id="model" value="#{autoBean.selectedAuto.model}" styleClass="form-control" required="true" requiredMessage="Le modèle est obligatoire"/>
+                </div>
+                <div class="form-group">
+                    <h:outputLabel for="color" value="Couleur:"/>
+                    <h:inputText id="color" value="#{autoBean.selectedAuto.color}" styleClass="form-control" required="true" requiredMessage="La couleur est obligatoire"/>
+                </div>
+                <div class="form-group">
+                    <h:outputLabel for="user" value="Propriétaire:"/>
+                    <h:selectOneMenu id="user" value="#{autoBean.selectedUserId}" styleClass="form-control" required="true" requiredMessage="Le propriétaire est obligatoire">
+                        <f:selectItem itemLabel="-- Sélectionner un utilisateur --" itemValue="" noSelectionOption="true"/>
+                        <f:selectItems value="#{autoBean.getAllUsers()}" var="user" itemValue="#{user.id}" itemLabel="#{user.name}"/>
+                    </h:selectOneMenu>
+                </div>
+                <div class="form-group">
+                    <h:commandButton value="Ajouter Voiture" action="#{autoBean.saveAuto}" styleClass="btn"/>
+                </div>
+            </h:form>
+        </div>
+
+        <!-- Auto List -->
+        <div class="panel">
+            <h2>Liste des Automobiles</h2>
+            <h:form>
+                <h:dataTable value="#{autoBean.autoList}" var="auto" styleClass="table">
+                    <h:column>
+                        <f:facet name="header">ID</f:facet>
+                        #{auto.id}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Modèle</f:facet>
+                        #{auto.model}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Couleur</f:facet>
+                        #{auto.color}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Propriétaire</f:facet>
+                        #{auto.user.name}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Actions</f:facet>
+                        <h:commandButton value="Supprimer" action="#{autoBean.deleteAuto(auto.id)}" styleClass="btn btn-danger"
+                                         onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette voiture?')"/>
+                    </h:column>
+                </h:dataTable>
+            </h:form>
+        </div>
+    </div>
+</h:body>
+</html>
