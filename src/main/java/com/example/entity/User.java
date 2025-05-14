@@ -15,7 +15,8 @@ public class User {
     private String name;
     private int age;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    // Modifié de LAZY à EAGER pour résoudre l'erreur de lazy initialization
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Auto> autos = new ArrayList<>();
 
     // Constructors

@@ -14,7 +14,7 @@ public class Auto {
     private String model;
     private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 

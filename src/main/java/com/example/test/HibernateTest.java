@@ -1,4 +1,4 @@
-package com.example.util;
+package com.example.test;
 
 import com.example.entity.Auto;
 import com.example.entity.User;
