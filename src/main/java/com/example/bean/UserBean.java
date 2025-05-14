@@ -32,14 +32,8 @@ public class UserBean implements Serializable {
 
     // Save user
     public String saveUser() {
-        // La méthode merge gère automatiquement la création/mise à jour
-        // mais nous devons nous assurer que l'ID est correct
-
-        if (!editing && selectedUser.getId() != 0) {
-            selectedUser.setId(0); // Forcer uniquement si l'utilisateur n'est pas en mode édition
-        }
-
-
+        // We let Hibernate handle the merge operation properly
+        // The ID will be preserved if we're in edit mode
         userService.saveUser(selectedUser);
         selectedUser = new User();
         loadUsers();
@@ -56,8 +50,8 @@ public class UserBean implements Serializable {
 
     // Begin edit user
     public String editUser(User user) {
-        // Récupérer une copie fraîche de l'utilisateur de la base de données
-        // au lieu d'utiliser directement la référence de la liste
+        // Important: Get a fresh copy of the user from the database
+        // to avoid detached entity issues
         selectedUser = userService.getUserById(user.getId());
         editing = true;
         return null;

@@ -6,7 +6,6 @@ import com.example.service.AutoService;
 import com.example.service.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
@@ -23,6 +22,7 @@ public class AutoBean implements Serializable {
     private AutoService autoService = new AutoService();
     private UserService userService = new UserService();
     private int selectedUserId;
+    private boolean editing = false;  // Added editing flag
 
     @PostConstruct
     public void init() {
@@ -34,13 +34,14 @@ public class AutoBean implements Serializable {
         autoList = autoService.getAllAutos();
     }
 
-    // Save auto
+    // Save auto (create or update)
     public String saveAuto() {
         User user = userService.getUserById(selectedUserId);
         selectedAuto.setUser(user);
         autoService.saveAuto(selectedAuto);
         selectedAuto = new Auto();
         loadAutos();
+        editing = false;  // Reset editing flag after save
         return null;
     }
 
@@ -48,6 +49,28 @@ public class AutoBean implements Serializable {
     public String deleteAuto(int id) {
         autoService.deleteAuto(id);
         loadAutos();
+        return null;
+    }
+
+    // Edit auto (added new method)
+    public String editAuto(Auto auto) {
+        // Get a fresh copy from the database
+        selectedAuto = autoService.getAutoById(auto.getId());
+
+        // Set the selectedUserId to maintain the dropdown selection
+        if (selectedAuto.getUser() != null) {
+            selectedUserId = selectedAuto.getUser().getId();
+        }
+
+        editing = true;
+        return null;
+    }
+
+    // Cancel edit (added new method)
+    public String cancelEdit() {
+        selectedAuto = new Auto();
+        selectedUserId = 0;
+        editing = false;
         return null;
     }
 
@@ -75,5 +98,13 @@ public class AutoBean implements Serializable {
 
     public void setSelectedUserId(int selectedUserId) {
         this.selectedUserId = selectedUserId;
+    }
+
+    public boolean isEditing() {
+        return editing;
+    }
+
+    public void setEditing(boolean editing) {
+        this.editing = editing;
     }
 }

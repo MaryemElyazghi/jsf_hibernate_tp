@@ -119,7 +119,7 @@
 
         <!-- Auto Form -->
         <div class="panel">
-            <h2>Ajouter une Automobile</h2>
+            <h2>#{autoBean.editing ? 'Modifier' : 'Ajouter'} une Automobile</h2>
             <h:form>
                 <div class="form-group">
                     <h:outputLabel for="model" value="Modèle:"/>
@@ -137,7 +137,8 @@
                     </h:selectOneMenu>
                 </div>
                 <div class="form-group">
-                    <h:commandButton value="Ajouter Voiture" action="#{autoBean.saveAuto}" styleClass="btn"/>
+                    <h:commandButton value="#{autoBean.editing ? 'Mettre à jour' : 'Ajouter'}" action="#{autoBean.saveAuto}" styleClass="btn"/>
+                    <h:commandButton value="Annuler" action="#{autoBean.cancelEdit}" styleClass="btn btn-warning" rendered="#{autoBean.editing}" style="margin-left: 10px;"/>
                 </div>
             </h:form>
         </div>
@@ -165,6 +166,7 @@
                     </h:column>
                     <h:column>
                         <f:facet name="header">Actions</f:facet>
+                        <h:commandButton value="Mise à jour" action="#{autoBean.editAuto(auto)}" styleClass="btn btn-warning" style="margin-right: 5px;"/>
                         <h:commandButton value="Supprimer" action="#{autoBean.deleteAuto(auto.id)}" styleClass="btn btn-danger"
                                          onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette voiture?')"/>
                     </h:column>
